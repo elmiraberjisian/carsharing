@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 
+import os
 # Initialize session state to store the roadmap data
 if "roadmap" not in st.session_state:
     st.session_state.roadmap = {
@@ -121,3 +122,35 @@ if st.button("Submit Response"):
         st.write(response_data)
 
     st.write(response_data)
+csv_file_path = "survey_responses.csv"
+
+# Function to save data to CSV
+def save_to_local_csv(name, selected_actions, comments):
+    # Prepare data for saving
+    barriers = [barrier for barrier, action in selected_actions]
+    actions = [action for barrier, action in selected_actions]
+    
+    # Create a DataFrame
+    response_data = pd.DataFrame({
+        "Name": [name] * len(actions),
+        "Barrier": barriers,
+        "Action": actions,
+        "Comments": [comments] * len(actions)
+    })
+    
+    # Append to the CSV file or create it if it doesn’t exist
+    if os.path.exists(csv_file_path):
+        response_data.to_csv(csv_file_path, mode='a', header=False, index=False)
+    else:
+        response_data.to_csv(csv_file_path, mode='w', header=True, index=False)
+
+    st.success("Your response has been saved locally!")
+
+# In your Submit Response section
+if st.button("Submit Response"):
+    if not selected_actions:
+        st.error("Please select at least one action before submitting.")
+    elif not name:
+        st.error("Please enter your name and agency before submitting.")
+    else:
+        save_to_local_csv(name, selected_actions, comments)
