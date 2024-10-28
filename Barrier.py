@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import io
 import requests
+import base64
 import os
 
 # GitHub repository details
@@ -105,10 +106,15 @@ def upload_csv_to_github(name, csv_data):
         "Content-Type": "application/json"
     }
     message = f"Add survey response from {name}"
+
+    # Encode the CSV data as Base64
+    content = base64.b64encode(csv_data.encode("utf-8")).decode("utf-8")
+    
     data = {
         "message": message,
-        "content": csv_data.encode("utf-8").decode("utf-8")  # Convert to base64 for GitHub
+        "content": content
     }
+
     response = requests.put(url, headers=headers, json=data)
     if response.status_code == 201:
         st.success("Response submitted and saved to GitHub!")
