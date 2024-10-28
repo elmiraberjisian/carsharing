@@ -6,7 +6,7 @@ import os
 
 # GitHub repository details
 GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]  # Load token from Streamlit Secrets
-GITHUB_REPO = "your-username/your-repo-name"  # Replace with your GitHub username and repository name
+GITHUB_REPO = "elmiraberjisian/carsharing"  # Replace with your GitHub username and repository name
 GITHUB_PATH = "responses/"  # Folder in your repo where CSVs will be stored
 
 # Initialize session state to store the roadmap data
