@@ -94,17 +94,30 @@ comments = st.text_area("Additional Comments or Thoughts")
 
 # Submit button
 if st.button("Submit Response"):
-    # Convert selections to DataFrame for storage
-    response_data = pd.DataFrame({
-        "Name": [name],
-        "Barrier": [barrier for barrier, action in selected_actions],
-        "Action": [action for barrier, action in selected_actions],
-        "Comments": [comments]
-    })
-    # Save the response to a CSV file
-    response_data.to_csv(f"{name}_response.csv", index=False)
-    st.success("Your response has been submitted and saved!")
+    # Check if there is at least one action selected
+    if not selected_actions:
+        st.error("Please select at least one action before submitting.")
+    elif not name:
+        st.error("Please enter your name and agency before submitting.")
+    else:
+        # Prepare the data for submission
+        barriers = [barrier for barrier, action in selected_actions]
+        actions = [action for barrier, action in selected_actions]
+        
+        # Convert selections to DataFrame for storage
+        response_data = pd.DataFrame({
+            "Name": [name] * len(actions),
+            "Barrier": barriers,
+            "Action": actions,
+            "Comments": [comments] * len(actions)
+        })
 
-    # Display the response for confirmation
-    st.write("### Your Submission")
+        # Save the response to a CSV file
+        response_data.to_csv(f"{name}_response.csv", index=False)
+        st.success("Your response has been submitted and saved!")
+
+        # Display the response for confirmation
+        st.write("### Your Submission")
+        st.write(response_data)
+
     st.write(response_data)
