@@ -1,7 +1,14 @@
 import streamlit as st
 import pandas as pd
-
+import io
+import requests
 import os
+
+# GitHub repository details
+GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]  # Load token from Streamlit Secrets
+GITHUB_REPO = "elmiraberjisian/carsharing"  # Replace with your GitHub username and repository name
+GITHUB_PATH = "responses/"  # Folder in your repo where CSVs will be stored
+
 # Initialize session state to store the roadmap data
 if "roadmap" not in st.session_state:
     st.session_state.roadmap = {
@@ -63,14 +70,11 @@ action = st.text_input("Enter Action for Selected Barrier")
 # Add Barrier and Action button
 if st.button("Add Barrier/Action"):
     if new_barrier:
-        # Add new barrier
         if new_barrier not in st.session_state.roadmap:
             st.session_state.roadmap[new_barrier] = []
-        # Add action to the new barrier
         if action and action not in st.session_state.roadmap[new_barrier]:
             st.session_state.roadmap[new_barrier].append(action)
     elif existing_barrier and action:
-        # Add action to the selected existing barrier
         if action not in st.session_state.roadmap[existing_barrier]:
             st.session_state.roadmap[existing_barrier].append(action)
     st.success("Barrier and/or Action added!")
@@ -93,13 +97,31 @@ for barrier, actions in st.session_state.roadmap.items():
 # Comments
 comments = st.text_area("Additional Comments or Thoughts")
 
+# Function to upload CSV to GitHub
+def upload_csv_to_github(name, csv_data):
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_PATH}{name}_response.csv"
+    headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    message = f"Add survey response from {name}"
+    data = {
+        "message": message,
+        "content": csv_data.encode("utf-8").decode("utf-8")  # Convert to base64 for GitHub
+    }
+    response = requests.put(url, headers=headers, json=data)
+    if response.status_code == 201:
+        st.success("Response submitted and saved to GitHub!")
+    else:
+        st.error(f"Error uploading to GitHub: {response.status_code}")
+        st.error(response.json())
+
 # Submit button
-if st.button("Submit Response"):
-    # Check if there is at least one action selected
+if st.button("Submit Response", key="submit_button"):
     if not selected_actions:
-        st.error("Please select at least one action before submitting.")
+        st.error("Please select at least one action before submitting.", key="select_action_error")
     elif not name:
-        st.error("Please enter your name and agency before submitting.")
+        st.error("Please enter your name and agency before submitting.", key="name_error")
     else:
         # Prepare the data for submission
         barriers = [barrier for barrier, action in selected_actions]
@@ -113,44 +135,10 @@ if st.button("Submit Response"):
             "Comments": [comments] * len(actions)
         })
 
-        # Save the response to a CSV file
-        response_data.to_csv(f"{name}_response.csv", index=False)
-        st.success("Your response has been submitted and saved!")
+        # Save the CSV data to a buffer
+        csv_buffer = io.StringIO()
+        response_data.to_csv(csv_buffer, index=False)
+        csv_data = csv_buffer.getvalue()
 
-        # Display the response for confirmation
-        st.write("### Your Submission")
-        st.write(response_data)
-
-    st.write(response_data)
-csv_file_path = "survey_responses.csv"
-
-# Function to save data to CSV
-def save_to_local_csv(name, selected_actions, comments):
-    # Prepare data for saving
-    barriers = [barrier for barrier, action in selected_actions]
-    actions = [action for barrier, action in selected_actions]
-    
-    # Create a DataFrame
-    response_data = pd.DataFrame({
-        "Name": [name] * len(actions),
-        "Barrier": barriers,
-        "Action": actions,
-        "Comments": [comments] * len(actions)
-    })
-    
-    # Append to the CSV file or create it if it doesn’t exist
-    if os.path.exists(csv_file_path):
-        response_data.to_csv(csv_file_path, mode='a', header=False, index=False)
-    else:
-        response_data.to_csv(csv_file_path, mode='w', header=True, index=False)
-
-    st.success("Your response has been saved locally!")
-
-# In your Submit Response section
-if st.button("Submit Response"):
-    if not selected_actions:
-        st.error("Please select at least one action before submitting.")
-    elif not name:
-        st.error("Please enter your name and agency before submitting.")
-    else:
-        save_to_local_csv(name, selected_actions, comments)
+        # Upload CSV to GitHub
+        upload_csv_to_github(
