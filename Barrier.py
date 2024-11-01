@@ -132,7 +132,7 @@ def upload_csv_to_github(name, csv_data):
 # Submit button
 if st.button("Submit Response", key="submit_button"):
     if not name:
-        st.error("Please enter your name and agency before submitting.", key="name_error")
+        st.error("Please enter name and agency before submitting.")  # Removed `key` parameter and updated message
     else:
         # Prepare the data for submission
         barrier_data = []
