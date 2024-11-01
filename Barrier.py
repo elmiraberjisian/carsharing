@@ -68,8 +68,8 @@ if "roadmap" not in st.session_state:
 st.title("Barrier-Opportunity Survey")
 
 st.markdown("""
-Please review the list of barrier-Opportunity pairs below. If there is any barrier not mentioned, please add it.
-If there is an Opportunity relevant to a barrier, add it too.
+Please review the list of barrier-opportunity pairs below. If there is any barrier not mentioned, please add it.
+If there is an opportunity relevant to a barrier, add it too.
 """)
 
 # Name input
@@ -80,28 +80,27 @@ st.subheader("Add or Select a Barrier")
 existing_barrier = st.selectbox("Select Existing Barrier", [""] + list(st.session_state.roadmap.keys()))
 new_barrier = st.text_input("Or Enter a New Barrier")
 
-# Action addition
-action = st.text_input("Enter Opportunity for Selected Barrier")
+# Opportunity addition
+opportunity = st.text_input("Enter Opportunity for Selected Barrier")
 
-# Add Barrier and Action button
+# Add Barrier and Opportunity button
 if st.button("Add Barrier/Opportunity"):
     if new_barrier:
         if new_barrier not in st.session_state.roadmap:
             st.session_state.roadmap[new_barrier] = []
-        if action and action not in st.session_state.roadmap[new_barrier]:
-            st.session_state.roadmap[new_barrier].append(action)
-    elif existing_barrier and action:
-        if action not in st.session_state.roadmap[existing_barrier]:
-            st.session_state.roadmap[existing_barrier].append(action)
-    st.success("Barrier and/or Action added!")
+        if opportunity and opportunity not in st.session_state.roadmap[new_barrier]:
+            st.session_state.roadmap[new_barrier].append(opportunity)
+    elif existing_barrier and opportunity:
+        if opportunity not in st.session_state.roadmap[existing_barrier]:
+            st.session_state.roadmap[existing_barrier].append(opportunity)
+    st.success("Barrier and/or Opportunity added!")
 
 # Display current roadmap
 st.subheader("Current Barrier-Opportunity List")
-for barrier, actions in st.session_state.roadmap.items():
+for barrier, opportunities in st.session_state.roadmap.items():
     st.write(f"**{barrier}**:")
-    for act in actions:
-        st.write(f"- {act}")
-
+    for opp in opportunities:
+        st.write(f"- {opp}")
 
 # Comments
 comments = st.text_area("Additional Comments or Thoughts")
@@ -132,22 +131,19 @@ def upload_csv_to_github(name, csv_data):
 
 # Submit button
 if st.button("Submit Response", key="submit_button"):
-    if not selected_actions:
-        st.error("Please select at least one action before submitting.", key="select_action_error")
-    elif not name:
+    if not name:
         st.error("Please enter your name and agency before submitting.", key="name_error")
     else:
         # Prepare the data for submission
-        barriers = [barrier for barrier, action in selected_actions]
-        actions = [action for barrier, action in selected_actions]
-        
-        # Convert selections to DataFrame for storage
-        response_data = pd.DataFrame({
-            "Name": [name] * len(actions),
-            "Barrier": barriers,
-            "Action": actions,
-            "Comments": [comments] * len(actions)
-        })
+        barrier_data = []
+        for barrier, opportunities in st.session_state.roadmap.items():
+            for opp in opportunities:
+                barrier_data.append({"Barrier": barrier, "Opportunity": opp})
+
+        # Convert barrier data to DataFrame for storage
+        response_data = pd.DataFrame(barrier_data)
+        response_data["Name"] = name
+        response_data["Comments"] = comments
 
         # Save the CSV data to a buffer
         csv_buffer = io.StringIO()
@@ -155,4 +151,8 @@ if st.button("Submit Response", key="submit_button"):
         csv_data = csv_buffer.getvalue()
 
         # Upload CSV to GitHub
-        upload_csv_to_gith
+        upload_csv_to_github(name, csv_data)
+
+        # Display the response for confirmation
+        st.write("### Your Submission")
+        st.write(response_data)
