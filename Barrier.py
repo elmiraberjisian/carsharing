@@ -3,7 +3,6 @@ import pandas as pd
 import io
 import requests
 import base64
-import os
 
 # GitHub repository details
 GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]  # Load token from Streamlit Secrets
@@ -13,38 +12,55 @@ GITHUB_PATH = "responses/"  # Folder in your repo where CSVs will be stored
 # Initialize session state to store the roadmap data
 if "roadmap" not in st.session_state:
     st.session_state.roadmap = {
-        "Small Market Share": [
-            "Tiered/predictable pricing packages",
-            "Ensuring spatial accessibility throughout the region",
-            "Reduced residential parking requirements",
-            "Placing vehicles within/nearby residence locations"
+        "Low Market Share": [
+            "Targeted outreach and education",
+            "Enabling access for rural and remote to transit",
+            "Partnering with employees",
+            "Placement in residential neighborhoods",
+            "Placement near trip generators"
         ],
-        "Induced Demand/Externality": [
+        "Affordability and Price Predictability": [
+            "MaaS integration",
+            "Reduced parking requirements"
+        ],
+        "Temporal and Spatial Availability": [
+            "Spatial and temporal demand modeling",
+            "Placement in residential neighborhoods",
+            "MaaS integration",
+            "Placement near transit hubs and frequent transit corridors",
+            "Placement near trip generators",
+            "Partnering with employees"
+        ],
+        "Induced Demand and Externalities": [
             "Zero emission fleet",
-            "Integration into MaaS",
-            "Placing vehicles in frequent transit corridors",
-            "Placing vehicles in TOD"
+            "MaaS integration",
+            "Placement near transit hubs and frequent transit corridors"
+        ],
+        "Convenience of Competing Modes": [
+            "MaaS integration"
+        ],
+        "Awareness and Familiarity": [
+            "Targeted outreach and education",
+            "Placement near transit hubs and frequent transit corridors",
+            "Partnering with employees",
+            "Placement near trip generators",
+            "Placement in residential neighborhoods"
+        ],
+        "Profitability Operator": [
+            "Reduced parking/permit fees"
+        ],
+        "Fleet Variety": [
+            "Zero emission fleet"
         ],
         "Equity": [
-            "Targeted outreach",
-            "Low-income pass"
+            "Subsidized fees for low-income"
         ],
         "Operational Challenges": [
-            "Placing vehicles in frequent transit corridors",
-            "Placing vehicles in TOD",
-            "Spatial-temporal demand models"
-        ],
-        "Accessibility": [
-            "Placing vehicles within/nearby residence locations",
-            "Ensuring spatial accessibility throughout the region",
-            "Placing vehicles in frequent transit corridors",
-            "Placing vehicles near trip generators (health care facilities, businesses, universities)",
-            "Spatial-temporal demand models"
-        ],
-        "Profitability": [
-            "Waiving/reduced parking fees",
-            "Spatial-temporal demand models",
-            "Reduced insurance fees"
+            "Placement near transit hubs and frequent transit corridors",
+            "Spatial and temporal demand modeling",
+            "Partnering with employees",
+            "Placement near trip generators",
+            "Placement in residential neighborhoods"
         ]
     }
 
@@ -147,8 +163,4 @@ if st.button("Submit Response", key="submit_button"):
         csv_data = csv_buffer.getvalue()
 
         # Upload CSV to GitHub
-        upload_csv_to_github(name, csv_data)
-
-        # Display the response for confirmation
-        st.write("### Your Submission")
-        st.write(response_data)
+        upload_csv_to_gith
