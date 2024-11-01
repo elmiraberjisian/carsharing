@@ -70,6 +70,7 @@ st.title("Barrier-Opportunity Survey")
 st.markdown("""
 Please review the list of barrier-opportunity pairs below. If there is any barrier not mentioned, please add it.
 If there is an opportunity relevant to a barrier, add it too.
+Please use the comment box for any other thoughts particularly regarding road map and scoping.
 """)
 
 # Name input
