@@ -96,7 +96,7 @@ if st.button("Add Barrier/Opportunity"):
     st.success("Barrier and/or Action added!")
 
 # Display current roadmap
-st.subheader("Current Barrier-Action List")
+st.subheader("Current Barrier-Opportunity List")
 for barrier, actions in st.session_state.roadmap.items():
     st.write(f"**{barrier}**:")
     for act in actions:
