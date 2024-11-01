@@ -65,12 +65,11 @@ if "roadmap" not in st.session_state:
     }
 
 # Streamlit interface
-st.title("Barrier-Action Survey")
+st.title("Barrier-Opportunity Survey")
 
 st.markdown("""
-Please review the list of barrier-action pairs below. If there is any barrier not mentioned, please add it.
-If there is an action that can address a barrier, add it too. When you are done, check any actions your
-agency can take and submit your response.
+Please review the list of barrier-Opportunity pairs below. If there is any barrier not mentioned, please add it.
+If there is an Opportunity relevant to a barrier, add it too.
 """)
 
 # Name input
@@ -82,10 +81,10 @@ existing_barrier = st.selectbox("Select Existing Barrier", [""] + list(st.sessio
 new_barrier = st.text_input("Or Enter a New Barrier")
 
 # Action addition
-action = st.text_input("Enter Action for Selected Barrier")
+action = st.text_input("Enter Opportunity for Selected Barrier")
 
 # Add Barrier and Action button
-if st.button("Add Barrier/Action"):
+if st.button("Add Barrier/Opportunity"):
     if new_barrier:
         if new_barrier not in st.session_state.roadmap:
             st.session_state.roadmap[new_barrier] = []
@@ -103,13 +102,6 @@ for barrier, actions in st.session_state.roadmap.items():
     for act in actions:
         st.write(f"- {act}")
 
-# Select actions user can take
-st.subheader("Select Actions Your Agency Can Take")
-selected_actions = []
-for barrier, actions in st.session_state.roadmap.items():
-    with st.expander(f"{barrier}"):
-        selected = st.multiselect(f"Actions for {barrier}", actions)
-        selected_actions.extend([(barrier, act) for act in selected])
 
 # Comments
 comments = st.text_area("Additional Comments or Thoughts")
